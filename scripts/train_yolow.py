@@ -85,6 +85,8 @@ def main():
         save_period=1,
         exist_ok=True,
         plots=True,
+        close_mosaic=12,  # disable mosaic for last epoch
+        nbs=64,
     )
     print("Training complete.")
 

@@ -6,10 +6,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=40G
 #SBATCH --time=24:00:00
-#SBATCH --output=logs/%j_gdino.out
-#SBATCH --error=logs/%j_gdino.err
+#SBATCH --output=/home/turing_lab/cse12210210/cv_project/logs/%j_gdino.out
+#SBATCH --error=/home/turing_lab/cse12210210/cv_project/logs/%j_gdino.err
 
-mkdir -p logs
+mkdir -p /home/turing_lab/cse12210210/cv_project/logs
 source /opt/ohpc/pub/apps/anaconda3/bin/activate gdino
 export PYTHONUNBUFFERED=1
 
@@ -31,9 +31,8 @@ python ~/cv_project/scripts/train_gdino.py \
 
 echo "Done: $SLURM_JOB_ID"
 
-# If not a resume run, echo reminder to submit resume job
 if [ "${RESUME:-0}" != "1" ]; then
     echo "=============="
-    echo "To resume: RESUME=1 NAME=${NAME:-gdino_baseline} sbatch ~/cv_project/scripts/sbatch_gdino.sh"
+    echo "To resume: RESUME=1 NAME=${NAME:-gdino_baseline} sbatch scripts/sbatch_gdino.sh"
     echo "=============="
 fi

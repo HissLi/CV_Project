@@ -6,10 +6,10 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=24:00:00
-#SBATCH --output=logs/%j_yolow.out
-#SBATCH --error=logs/%j_yolow.err
+#SBATCH --output=/home/turing_lab/cse12210210/cv_project/logs/%j_yolow.out
+#SBATCH --error=/home/turing_lab/cse12210210/cv_project/logs/%j_yolow.err
 
-mkdir -p logs
+mkdir -p /home/turing_lab/cse12210210/cv_project/logs
 source /opt/ohpc/pub/apps/anaconda3/bin/activate yolow
 export PYTHONUNBUFFERED=1
 
