@@ -17,7 +17,7 @@
 开放词汇目标检测（OVOD）目前在架构选型上存在两条主流路线：
 
 - **CNN 单阶段 + Late Fusion**：文本仅在分类头与视觉特征做轻量交互（如 YOLO-World）
-- **Transformer Query-based + Deep Fusion**：文本在 decoder 每一层通过 cross-attention 持续参与视觉特征构建（如 Grounding DINO）
+- **CNN 两阶段 Proposal-based**：RPN 先提取区域提议，分类头用 CLIP embedding 做开集分类（如 Detic）
 
 两种范式的核心差异在于**文本-视觉融合深度**——这决定了梯度流动路径、对超参数的敏感性、以及最终检测性能的天花板。目前没有人在控制变量的条件下对两者进行过系统对比。
 
@@ -31,39 +31,44 @@
 
 ## 2. 模型选择
 
-| 属性 | YOLO-World-L | Grounding DINO-B |
-|------|-------------|-------------------|
-| **范式** | CNN 单阶段 | Transformer Query-based |
-| **视觉骨干** | YOLOv8-L | Swin-B |
-| **语言编码器** | CLIP-L (frozen) | BERT-B (fine-tuned) |
-| **融合方式** | Late fusion — 分类头 text embedding 点积 | Deep fusion — 6 层 decoder cross-attention |
-| **参数量** | ~100M | ~200M |
-| **推荐 bs (L40)** | 8–16 | 4–8 |
-| **每 epoch 训练时间** | ~1.5h | ~3.5h |
+| 属性 | YOLO-World-L | Detic (Faster R-CNN) |
+|------|-------------|----------------------|
+| **范式** | CNN 单阶段 dense prediction | CNN 两阶段 proposal-based |
+| **视觉骨干** | YOLOv8-L | ResNet-50 |
+| **语言编码器** | CLIP-L (frozen) | CLIP (frozen, 仅生成分类器权重) |
+| **融合方式** | Late fusion — 分类头 text embedding 点积 | 解耦：RPN 纯视觉 + 分类头用 CLIP embedding 替换权重 |
+| **参数量** | ~100M | ~50M |
+| **推荐 bs (L40)** | 8–16 | 8–16 |
+| **每 epoch 训练时间（实测）** | ~0.45h (27min) | ~0.3h（预估） |
 | **官方预训练权重** | 有 | 有 |
+| **训练框架** | Ultralytics | Detectron2 |
 
 ### 选择理由
 
-- **架构对比度最大**：两者在文本-视觉融合谱系上分别占据浅端和深端，差异最显著
-- **训练成本可接受**：YOLO-World 训练很快（~1.5h/epoch），Grounding DINO 在单 L40 上也可完成
-- **都有成熟的预训练权重和代码库**：减少复现中的不确定性
-- **两者在 COCO 上均有优秀表现**，可进行有意义的性能对比
+- **检测范式对比度最大**：单阶段 dense prediction（YOLO-World）vs 两阶段 proposal-based（Detic），这是目标检测最核心的架构分水岭
+- **文本使用方式截然不同**：两者都用 CLIP，但 YOLO-World 在分类头做点积，Detic 直接用 CLIP embedding 替换分类器权重矩阵——相同的文本编码器，完全不同的利用策略
+- **训练成本低**：YOLO-World ~0.45h/epoch，Detic 基于 ResNet-50 预计更快，两项实验在 10 天内可完成
+- **都有成熟代码库**：Ultralytics + Detectron2 都是工业级框架
 
-### 核心差异：文本-视觉融合
+### 核心差异：检测范式 + 文本利用策略
 
 ```
-文本参与深度：
+检测范式：
 
-YOLO-World-L                      Grounding DINO-B
+YOLO-World-L                          Detic
      |                                    |
-     浅 ←←←←←←←←←←←←←←←←←←←←←←←←→ 深
+  Dense Prediction ←←←←←←←←→ Proposal-based
      |                                    |
- 仅分类头用 CLIP                  6 层 decoder 每层
- embedding 做点积                都有 cross-attention
- 文本梯度不回传                   文本梯度全量回传到视觉 backbone
+ 一次 forward 出所有框              RPN 先提 proposal
+ + 分类分数                        RoI pooling 后分类
+     |                                    |
+ 文本用于：分类头点积                文本用于：生成分类器权重
+ (每个位置都和 text emb 算相似度)    (CLIP emb 直接替换 FC 权重)
 ```
 
-文本参与越深，视觉 backbone 的优化景观受语言信号的扰动越大 → 超参数敏感性更高，尤其体现在 learning rate 和 warmup 设置上。
+两个关键分析维度：
+1. **单阶段 vs 两阶段**如何影响 lr、bs 的选择
+2. **相同的 CLIP 编码器，不同的利用方式**（点积 vs 权重替换）如何影响开集泛化
 
 ---
 
@@ -102,11 +107,11 @@ Day 1      Day 2–4           Day 5–7            Day 8–10
 
 | 任务 | 内容 | 预计耗时 |
 |------|------|----------|
-| Conda 环境 | 创建 yolow + gdino 两个 conda env | 2h |
+| Conda 环境 | 创建 yolow + detic 两个 conda env | 2h |
 | YOLO-World 环境 | `pip install ultralytics` + pycocotools, wandb | 0.5h |
-| GDINO 环境 | transformers, accelerate, timm, opencv, pycocotools | 0.5h |
-| COCO 数据集 | 如果服务器已有，直接软链接；否则需下载（~19GB） | 0–4h |
-| 模型权重 | 下载 YOLO-World-L (90MB) + GDINO-B (895MB) 预训练权重 | 0.5h |
+| Detic 环境 | detectron2, torch, CLIP, pycocotools | 1h |
+| COCO 数据集 | 已有，无需重新下载 | 0h |
+| 模型权重 | 下载 YOLO-World-L (90MB) + Detic ResNet-50 预训练权重 | 0.5h |
 | 验证 | 各跑 1 个 mini-batch 确认 pipeline 通过 | 0.5h |
 
 **预计**：4–8 小时（含可能的 COCO 下载）
@@ -115,17 +120,17 @@ Day 1      Day 2–4           Day 5–7            Day 8–10
 
 两个模型各跑 1 次完整训练，使用官方推荐超参数。
 
-| 参数 | YOLO-World-L | Grounding DINO-B |
+| 参数 | YOLO-World-L | Detic (ResNet-50) |
 |------|-------------|-------------------|
-| Learning rate | 2e-4 | 1e-4 |
-| Batch size | 8 | 4 |
+| Learning rate | 2e-4 | 2e-4（待确认官方默认值） |
+| Batch size | 8 | 8 |
 | Epochs | 12 | 12 |
 | Warmup steps | 1000 | 1000 |
-| Optimizer | AdamW | AdamW |
+| Optimizer | AdamW | SGD（待确认） |
 | Weight decay | 0.05 | 1e-4 |
-| Image size | 640 | 800 |
+| Image size | 640 | 640 |
 | Scheduler | cosine | cosine |
-| **预计训练时长** | **~18h** | **~42h** |
+| **预计训练时长** | **~5.5h** | **~3.6h（预估）** |
 
 **目的**：
 - 建立性能基线（AP, AP50, AP75, AP_s, AP_m, AP_l）
@@ -138,15 +143,14 @@ Day 1      Day 2–4           Day 5–7            Day 8–10
 
 | 模型 | lr 扫描范围 | 单次训练时间 | 4 组总时间 |
 |------|-----------|-------------|-----------|
-| YOLO-World-L | [5e-5, 1e-4, 2e-4 (baseline), 5e-4] | ~9h | ~36h |
-| Grounding DINO-B | [1e-5, 5e-5, 1e-4 (baseline), 5e-4] | ~21h | ~84h |
+| YOLO-World-L | [5e-5, 1e-4, 2e-4 (baseline), 5e-4] | ~2.7h (6 epoch) | ~10.8h |
+| Detic | [5e-5, 1e-4, 2e-4, 5e-4] | ~1.8h（预估） | ~7.2h（预估） |
 
-> **注意**：Phase 2 优先跑 YOLO-World（快），再跑 GDINO。YOLO 的 4 组 lr 中有一组复用 Phase 1 baseline 结果（lr=2e-4），实际只需跑 3 组新的。
+> **注意**：YOLO 的 4 组 lr 中有一组复用 Phase 1 baseline 结果（lr=2e-4），实际只需跑 3 组新的。
 
 **预期发现**：
-- YOLO-World 的最优 lr 区间预期较宽（CNN 的批归一化提供了隐式正则化），可能在 1e-4 ~ 5e-4 范围内表现平稳
-- Grounding DINO 的最优 lr 区间预期较窄（深层 cross-attention 放大梯度方差），偏离最优 lr 后性能下降更快
-- 两者的最优 lr 值可能有数量级差异
+- YOLO-World（单阶段 dense）的 lr 敏感性受 PAN neck 的 batch norm 影响，预期最优 lr 区间较宽
+- Detic（两阶段 proposal-based）的 RPN 和分类头可能需要不同 lr 尺度，RPN lr 过高会降低 proposal 质量
 
 ### 4.4 Phase 3：最优配置全训练 + 最终评估（Day 8–10）
 
@@ -154,8 +158,8 @@ Phase 2 中每模型选出最优 lr，然后跑完整的 12 epochs：
 
 | 模型 | 训练时间 | 任务 |
 |------|---------|------|
-| YOLO-World-L (best lr) | ~18h | 完整 12 epoch 训练 + COCO val 评估 |
-| Grounding DINO-B (best lr) | ~42h | 完整 12 epoch 训练 + COCO val 评估 |
+| YOLO-World-L (best lr) | ~5.5h | 完整 12 epoch 训练 + COCO val 评估 |
+| Detic (best lr) | ~3.6h（预估） | 完整 12 epoch 训练 + COCO val 评估 |
 
 评估指标：
 - mAP, AP50, AP75
@@ -170,12 +174,12 @@ Phase 2 中每模型选出最优 lr，然后跑完整的 12 epochs：
          D1    D2    D3    D4    D5    D6    D7    D8    D9    D10
          ──    ──    ──    ──    ──    ──    ──    ──    ──    ──
 Phase 0  ████
-Phase 1  ██    ██████████████
-        (YW)  (YW 18h)      (GD 42h)
-Phase 2               ████████████████████████████████████████
-                     (YW lr sweep 36h)    (GD lr sweep 84h)
-Phase 3                                                     ████████████
-                                                           (best full train)
+Phase 1  ██    ████████████
+        (YW)  (YW 5.5h)  (Detic 3.6h)
+Phase 2          ████████████████████████████
+                (YW lr sweep 10.8h)  (Detic lr sweep 7.2h)
+Phase 3                                     ██████████████████
+                                           (best full train)
 Analysis         ←←←←←←←←←←←← 贯穿全程，训练间歇进行 →→→→→→→→→→→→
 ```
 
@@ -183,12 +187,12 @@ Analysis         ←←←←←←←←←←←← 贯穿全程，训练间�
 
 | 阶段 | 内容 | 时长 | 累计 |
 |------|------|------|------|
-| Phase 0 | 环境配置 | 1 天 | 1 天 |
-| Phase 1 | YOLO baseline | 0.75 天 | 1.75 天 |
-| Phase 1 | GDINO baseline | 1.75 天 | 3.5 天 |
-| Phase 2 | YOLO lr sweep (3 新 lr) | 1.5 天 | 5 天 |
-| Phase 2 | GDINO lr sweep (4 lr) | 3.5 天 | 8.5 天 |
-| Phase 3 | Best 配置各训 12 epoch | 视时间而定 | — |
+| Phase 0 | 环境配置 + Detic 搭建 | 1 天 | 1 天 |
+| Phase 1 | YOLO baseline（已完成） | 0.25 天 | 1.25 天 |
+| Phase 1 | Detic baseline | 0.15 天 | 1.4 天 |
+| Phase 2 | YOLO lr sweep (3 新 lr) | 0.45 天 | ~2 天 |
+| Phase 2 | Detic lr sweep (4 lr) | 0.3 天 | ~2.3 天 |
+| Phase 3 | Best 配置各训 12 epoch | 0.4 天 | ~3 天 |
 
 **风险缓解**：
 - 如果时间紧张，Phase 3 可跳过——Phase 2 的 6-epoch 结果已足以分析 lr 敏感性
@@ -204,14 +208,14 @@ Analysis         ←←←←←←←←←←←← 贯穿全程，训练间�
 对每个模型绘制 lr-AP 曲线，分析：
 - **最优 lr 的绝对值差异** → 反映优化景观的"陡峭程度"
 - **曲线的宽度（robustness）** → CNN 的 BN 提供隐式正则化，预期 YOLO-World 曲线更平坦
-- **高 lr 区谁崩得更快** → 深层融合模型（GDINO）预期在高 lr 下更快发散
+- **高 lr 区谁崩得更快** → 两阶段模型的 RPN 可能在高 lr 下 proposal 质量下降明显
 
 ### 6.2 训练动力学分析
 
 同一模型在不同 lr 下的训练曲线对比：
 - Loss 下降速度 vs 最终收敛水平
 - 训练集 vs 验证集的过拟合 gap
-- GDINO 的 text encoder 梯度范数 vs lr 的关系
+- Detic 的 RPN loss vs 分类 loss 的收敛差异
 
 ### 6.3 Error Breakdown
 
@@ -219,27 +223,27 @@ Analysis         ←←←←←←←←←←←← 贯穿全程，训练间�
 
 | 错误类型 | 含义 | 预期差异 |
 |---------|------|---------|
-| Cls | 框对、类错 | YOLO 更多（late fusion 语义辨别弱） |
-| Loc | 类对、框偏 | GDINO 更少（Transformer 定位天然更准） |
-| Miss | 漏检 | YOLO 可能更多小物体漏检 |
-| Bkg | 背景误检 | GDINO 更多（query 机制可能过度关注背景） |
+| Cls | 框对、类错 | YOLO 可能更多（dense prediction 类别歧义大） |
+| Loc | 类对、框偏 | Detic 可能更少（RoI pooling 精准定位） |
+| Miss | 漏检 | Detic 可能更少（RPN recall 高），YOLO 可能漏小物体 |
+| Bkg | 背景误检 | YOLO 可能更多（dense prediction 输出密集） |
 
 ### 6.4 按目标大小分层分析
 
-COCO 的 AP_s / AP_m / AP_l 天然允许按目标大小分析：
-- **小物体 (AP_s)**：GDINO 的多尺度 deformable attention 在定位小物体上预期有优势
-- **大物体 (AP_l)**：两者预期接近，大物体的检测更多由语义决定而非定位精度
+COCO 的 AP_s / AP_m / AP_l：
+- **小物体 (AP_s)**：Detic 的 RPN+RoI 对高分辨率特征处理较好，YOLO 的跨尺度 PAN 也有优势，需要实测对比
+- **大物体 (AP_l)**：两者预期接近
 
-### 6.5 文本编码器角色分析
+### 6.5 文本编码器策略对比
 
-| 维度 | CLIP (YOLO-World) | BERT (Grounding DINO) |
-|------|-------------------|----------------------|
-| 预训练方式 | 图文配对（语义天然对齐视觉） | 纯文本（语义丰富但与视觉不对齐） |
-| Fine-tune 策略 | 冻结 | 微调 |
-| 梯度影响 | 文本不产生视觉梯度 | 文本梯度全量回传 |
-| 对 lr 的敏感性 | 间接（通过分类头 loss 权重） | 直接（BERT 参数直接被优化） |
+| 维度 | YOLO-World | Detic |
+|------|-----------|-------|
+| CLIP 使用方式 | 分类头与 text embedding 做点积 | CLIP embedding 直接替换 FC 权重 |
+| 文本参与梯度 | 无（CLIP 冻结，点积不产生文本梯度） | 无（CLIP 仅用来生成固定权重） |
+| 开集能力来源 | 可替换 text prompt | 可替换 CLIP embedding |
+| 训练学什么 | 视觉特征到 CLIP 空间的映射 | 区域特征对齐到 CLIP 空间 |
 
-这个差异是理解"为什么 GDINO 对 lr 更敏感"的关键——GDINO 的 BERT 在训练中需要学习跨模态对齐，lr 太大会破坏 BERT 的语义结构，lr 太小则对齐速度慢。
+两者都冻结 CLIP，差异在于视觉特征如何与 CLIP 空间交互——点积 vs 权重替换。
 
 ---
 
@@ -262,19 +266,17 @@ python train_yolow.py \
     --device 0
 ```
 
-### Grounding DINO Baseline
+### Detic Baseline（Detectron2）
 
 ```bash
-python train_gdino.py \
+python train_detic.py \
     --dataset coco \
-    --model groundingdino-base \
+    --config detic_swin_r50 \
     --epochs 12 \
-    --batch 4 \
-    --lr 1e-4 \
+    --batch 8 \
+    --lr 2e-4 \
     --warmup 1000 \
-    --optimizer AdamW \
-    --weight_decay 1e-4 \
-    --imgsz 800 \
+    --imgsz 640 \
     --device 0
 ```
 
@@ -284,13 +286,13 @@ python train_gdino.py \
 
 | 阶段 | 模型 | 组数 | epochs/组 | 总 GPU 时间 |
 |------|------|------|-----------|-------------|
-| Phase 1 | YOLO baseline | 1 | 12 | 18h |
-| Phase 1 | GDINO baseline | 1 | 12 | 42h |
-| Phase 2 | YOLO lr sweep | 3 (新) | 6 | 27h |
-| Phase 2 | GDINO lr sweep | 4 | 6 | 84h |
-| Phase 3 | YOLO best | 1 | 12 | 18h |
-| Phase 3 | GDINO best | 1 | 12 | 42h |
-| **总计** | | **11 组** | | **~231h (~9.6 天)** |
+| Phase 1 | YOLO baseline | 1 | 12 | 5.5h（已完成） |
+| Phase 1 | Detic baseline | 1 | 12 | ~3.6h（预估） |
+| Phase 2 | YOLO lr sweep | 3 (新) | 6 | ~8h |
+| Phase 2 | Detic lr sweep | 4 | 6 | ~7.2h（预估） |
+| Phase 3 | YOLO best | 1 | 12 | 5.5h |
+| Phase 3 | Detic best | 1 | 12 | ~3.6h（预估） |
+| **总计** | | **11 组** | | **~33h (~1.4 天)** |
 
 > Phase 3 视剩余时间灵活调整优先级。如果时间不足，Phase 2 的 6-epoch 结果已支撑完整分析。
 
@@ -298,10 +300,6 @@ python train_gdino.py \
 
 ## 9. 备用方案
 
-如果 Grounding DINO 训练时间超出预期，可启用：
+**Backup A**：如 Detectron2 环境问题无法解决，回退到 GroundingDINO-Tiny（更小的 Swin-T 骨干）
 
-**Backup A**：GDINO lr 扫描减少为 3 个 lr 值（省 21h）
-
-**Backup B**：YOLO-World-L + YOLO-World-M（同架构不同规模，分析 scaling 效应，训练都很快）
-
-**Backup C**：全部使用 6 epoch 训练 + 延长分析时间，放弃 12 epoch 全训练
+**Backup B**：全部使用 6 epoch 训练 + 延长分析时间

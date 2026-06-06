@@ -56,27 +56,25 @@ source /opt/ohpc/pub/apps/anaconda3/bin/activate yolow
 module load anaconda/4.12.0 && conda activate yolow
 ```
 
-### gdino — Grounding DINO-B 训练环境
+### detic — Detic 训练环境（Detectron2）
 
 | 组件 | 版本 |
 |------|------|
 | Python | 3.10 |
 | PyTorch | 2.5.1+cu121 |
 | TorchVision | 0.20.1+cu121 |
-| Transformers | 4.47.1 |
-| Accelerate | 1.13.0 |
-| Timm | 1.0.27 |
-| OpenCV | 4.13.0.92 |
+| Detectron2 | 待安装 |
+| CLIP | 待安装 |
 | pycocotools | 2.0.11 |
 
 激活方式：
 ```bash
-source /opt/ohpc/pub/apps/anaconda3/bin/activate gdino
+source /opt/ohpc/pub/apps/anaconda3/bin/activate detic
 # 或
-module load anaconda/4.12.0 && conda activate gdino
+module load anaconda/4.12.0 && conda activate detic
 ```
 
-> **注意**：transformers 必须使用 `4.47.x` 版本。`5.x` 版本移除了 GroundingDINO 支持；`4.57.x` 版本中 `AutoModelForObjectDetection` 不包含 GroundingDINO。加载模型需直接使用 `GroundingDinoForObjectDetection.from_pretrained()` 而非 `AutoModel`。
+> Detic 基于 Facebook Detectron2 框架，需要从源码编译或使用预编译 wheel。
 
 ## 数据集
 
@@ -116,19 +114,13 @@ module load anaconda/4.12.0 && conda activate gdino
 | 模型 | 位置 | 大小 |
 |------|------|------|
 | YOLO-World-L | `~/cv_project/models/yolov8l-worldv2.pt` | 90 MB |
-| Grounding DINO-B | `~/cv_project/models/gdino/` | 1.8 GB |
+| Detic (ResNet-50) | `~/cv_project/models/detic/` | 待下载 |
 
-Grounding DINO 文件列表：
+Detic 模型文件（来自 Facebook Research）：
 ```
-~/cv_project/models/gdino/
-├── config.json
-├── model.safetensors (891 MB)
-├── pytorch_model.bin  (893 MB)
-├── preprocessor_config.json
-├── special_tokens_map.json
-├── tokenizer.json
-├── tokenizer_config.json
-└── vocab.txt
+~/cv_project/models/detic/
+├── Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
+└── (CLIP 权重 + Detectron2 config)
 ```
 
 ## 训练脚本
@@ -136,42 +128,38 @@ Grounding DINO 文件列表：
 | 脚本 | 位置 | 用途 |
 |------|------|------|
 | `train_yolow.py` | `~/cv_project/scripts/` | YOLO-World COCO 训练 |
-| `train_gdino.py` | `~/cv_project/scripts/` | Grounding DINO COCO 训练 |
+| `train_detic.py` | `~/cv_project/scripts/` | Detic COCO 训练（Detectron2） |
 | `sbatch_yolow.sh` | `~/cv_project/scripts/` | YOLO sbatch 提交（24h 时限） |
-| `sbatch_gdino.sh` | `~/cv_project/scripts/` | GDINO sbatch 提交（48h 时限） |
+| `sbatch_detic.sh` | `~/cv_project/scripts/` | Detic sbatch 提交 |
 | `test_env.py` | `~/cv_project/` | GPU 环境验证脚本 |
-| `check_dl.sh` | `~/` | 下载监控脚本（可删除） |
 
 ## 训练基线超参数
 
-| 参数 | YOLO-World-L | Grounding DINO-B |
+| 参数 | YOLO-World-L | Detic (ResNet-50) |
 |------|-------------|-------------------|
-| Learning rate | 2e-4 | 1e-4 |
-| Batch size | 8 | 4 |
+| Learning rate | 2e-4 | 2e-4（待确认） |
+| Batch size | 8 | 8 |
 | Epochs | 12 | 12 |
 | Warmup steps | 1000 | 1000 |
-| Optimizer | AdamW | AdamW |
+| Optimizer | AdamW | SGD（待确认） |
 | Weight decay | 0.05 | 1e-4 |
-| Image size | 640 | 800 |
+| Image size | 640 | 640 |
 | Scheduler | cosine | cosine |
-| Gradient accumulation | — | 2 |
-| 预计每 epoch 时间 | ~1.5h | ~3.5h |
-| 预计总训练时间 | ~18h | ~42h |
-| 作业策略 | 单次 24h 完成 | 分两次 24h，第二次 `RESUME=1` 续训 |
+| Gradient accumulation | — | — |
+| 预计每 epoch 时间 | ~0.45h (27min，实测) | ~0.3h（预估） |
+| 预计总训练时间 | ~5.5h | ~3.6h（预估） |
+| 作业策略 | 单次完成 | 单次完成 |
 
 ## 提交作业
 
 ```bash
-# YOLO-World（18h，单次完成）
+# YOLO-World（~5.5h，单次完成）
 sbatch ~/cv_project/scripts/sbatch_yolow.sh
-# 带参数覆盖
 LR=5e-4 BS=8 NAME=yolow_lr5e4 sbatch ~/cv_project/scripts/sbatch_yolow.sh
 
-# Grounding DINO 第一次（~24h，跑约 7 epoch）
-NAME=gdino_baseline sbatch ~/cv_project/scripts/sbatch_gdino.sh
-
-# Grounding DINO 续训（~18h，跑剩余 epoch 到 12）
-RESUME=1 NAME=gdino_baseline sbatch ~/cv_project/scripts/sbatch_gdino.sh
+# Detic（~3.6h，单次完成）
+sbatch ~/cv_project/scripts/sbatch_detic.sh
+LR=5e-4 NAME=detic_lr5e4 sbatch ~/cv_project/scripts/sbatch_detic.sh
 
 # 交互式 GPU 作业（测试用）
 srun -p a100 --qos=a100 --gres=gpu:1 -n 1 --mem=16G -t 00:30:00 --pty bash

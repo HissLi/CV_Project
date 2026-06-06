@@ -1,0 +1,32 @@
+{
+  "experiment": "yolow_baseline",
+  "phase": "Phase 1 Baseline",
+  "model": "YOLO-World-L",
+  "pretrained": "yolov8l-worldv2.pt",
+  "job_id": "88948",
+  "start_time": "2026-06-06 12:47",
+  "end_time": "2026-06-06 19:07",
+  "duration": "5h 27m",
+  "gpu": "NVIDIA L40 (46GB)",
+  "hyperparameters": {
+    "epochs": 12,
+    "batch_size": 8,
+    "learning_rate": 2e-4,
+    "warmup_steps": 1000,
+    "optimizer": "AdamW",
+    "weight_decay": 0.05,
+    "image_size": 640,
+    "scheduler": "cosine",
+    "amp": true,
+    "close_mosaic": 12,
+    "nbs": 64
+  },
+  "results": {
+    "mAP50": 0.66122,
+    "mAP50_95": 0.49749,
+    "precision": 0.70418,
+    "recall": 0.60746,
+    "box_loss": 0.85913,
+    "cls_loss": 0.81059
+  }
+}
