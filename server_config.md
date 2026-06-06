@@ -56,25 +56,25 @@ source /opt/ohpc/pub/apps/anaconda3/bin/activate yolow
 module load anaconda/4.12.0 && conda activate yolow
 ```
 
-### detic — Detic 训练环境（Detectron2）
+### detic — Detic (Deformable DETR) 训练环境（已弃用）
+
+> 训练成本过高（~3.5 天），已放弃。环境保留供参考。
+
+### owlvit — OWL-ViT 零样本评估环境
 
 | 组件 | 版本 |
 |------|------|
 | Python | 3.10 |
 | PyTorch | 2.5.1+cu121 |
-| TorchVision | 0.20.1+cu121 |
-| Detectron2 | 待安装 |
-| CLIP | 待安装 |
-| pycocotools | 2.0.11 |
+| Transformers | 4.47.1 |
+| tqdm | 最新 |
 
 激活方式：
 ```bash
-source /opt/ohpc/pub/apps/anaconda3/bin/activate detic
-# 或
-module load anaconda/4.12.0 && conda activate detic
+source /opt/ohpc/pub/apps/anaconda3/bin/activate owlvit
 ```
 
-> Detic 基于 Facebook Detectron2 框架，需要从源码编译或使用预编译 wheel。
+> 仅用于零样本评估（`eval_owlvit.py`），不支持微调。
 
 ## 数据集
 
@@ -111,55 +111,49 @@ module load anaconda/4.12.0 && conda activate detic
 
 ## 模型权重
 
-| 模型 | 位置 | 大小 |
-|------|------|------|
-| YOLO-World-L | `~/cv_project/models/yolov8l-worldv2.pt` | 90 MB |
-| Detic (ResNet-50) | `~/cv_project/models/detic/` | 待下载 |
-
-Detic 模型文件（来自 Facebook Research）：
-```
-~/cv_project/models/detic/
-├── Detic_LCOCOI21k_CLIP_SwinB_896b32_4x_ft4x_max-size.pth
-└── (CLIP 权重 + Detectron2 config)
-```
+| 模型 | 位置 | 大小 | 用途 |
+|------|------|------|------|
+| YOLO-World-L | `~/cv_project/models/yolov8l-worldv2.pt` | 90 MB | 主实验模型 |
+| OWL-ViT-B/32 | `~/cv_project/models/owlvit/` | 613 MB | 零样本对照 |
 
 ## 训练脚本
 
 | 脚本 | 位置 | 用途 |
 |------|------|------|
 | `train_yolow.py` | `~/cv_project/scripts/` | YOLO-World COCO 训练 |
-| `train_detic.py` | `~/cv_project/scripts/` | Detic COCO 训练（Detectron2） |
 | `sbatch_yolow.sh` | `~/cv_project/scripts/` | YOLO sbatch 提交（24h 时限） |
-| `sbatch_detic.sh` | `~/cv_project/scripts/` | Detic sbatch 提交 |
+| `eval_owlvit.py` | `~/cv_project/scripts/` | OWL-ViT 零样本评估 |
 | `test_env.py` | `~/cv_project/` | GPU 环境验证脚本 |
 
 ## 训练基线超参数
 
-| 参数 | YOLO-World-L | Detic (ResNet-50) |
-|------|-------------|-------------------|
-| Learning rate | 2e-4 | 2e-4（待确认） |
-| Batch size | 8 | 8 |
-| Epochs | 12 | 12 |
-| Warmup steps | 1000 | 1000 |
-| Optimizer | AdamW | SGD（待确认） |
-| Weight decay | 0.05 | 1e-4 |
-| Image size | 640 | 640 |
-| Scheduler | cosine | cosine |
-| Gradient accumulation | — | — |
-| 预计每 epoch 时间 | ~0.45h (27min，实测) | ~0.3h（预估） |
-| 预计总训练时间 | ~5.5h | ~3.6h（预估） |
-| 作业策略 | 单次完成 | 单次完成 |
+| 参数 | YOLO-World-L Baseline |
+|------|----------------------|
+| Learning rate | 2e-4 |
+| Batch size | 8 |
+| Epochs | 12 |
+| Warmup steps | 1000 |
+| Optimizer | AdamW |
+| Weight decay | 0.05 |
+| Image size | 640 |
+| Scheduler | cosine |
+| 可训练参数 | 46.8M |
+| 每 epoch 时间 | ~0.45h (27min，实测) |
+| 12 epoch 总时间 | ~5.5h |
+| 6 epoch 时间 | ~2.7h |
 
 ## 提交作业
 
 ```bash
-# YOLO-World（~5.5h，单次完成）
+# YOLO-World baseline（12 epoch，~5.5h）
 sbatch ~/cv_project/scripts/sbatch_yolow.sh
-LR=5e-4 BS=8 NAME=yolow_lr5e4 sbatch ~/cv_project/scripts/sbatch_yolow.sh
 
-# Detic（~3.6h，单次完成）
-sbatch ~/cv_project/scripts/sbatch_detic.sh
-LR=5e-4 NAME=detic_lr5e4 sbatch ~/cv_project/scripts/sbatch_detic.sh
+# 快速扫描（6 epoch，~2.7h）
+LR=5e-4 EPOCHS=6 NAME=yolow_lr5e4_ep6 sbatch ~/cv_project/scripts/sbatch_yolow.sh
+
+# 改变 batch size
+BS=16 EPOCHS=6 NAME=yolow_bs16_ep6 sbatch ~/cv_project/scripts/sbatch_yolow.sh
+```
 
 # 交互式 GPU 作业（测试用）
 srun -p a100 --qos=a100 --gres=gpu:1 -n 1 --mem=16G -t 00:30:00 --pty bash

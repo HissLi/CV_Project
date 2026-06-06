@@ -1,12 +1,12 @@
-"""Detic (Deformable DETR + CLIP) fine-tuning on COCO 2017 via HuggingFace."""
+"""OWL-ViT fine-tuning on COCO 2017 via HuggingFace."""
 
 import argparse, os
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from transformers import (
-    DeformableDetrForObjectDetection,
-    AutoImageProcessor,
+    OwlViTForObjectDetection,
+    OwlViTImageProcessor,
     TrainingArguments,
     Trainer,
 )
@@ -28,9 +28,7 @@ COCO_CLASSES = [
 ]
 
 
-class CocoDeticDataset(Dataset):
-    """Returns raw images + annotations."""
-
+class CocoOwlVitDataset(Dataset):
     def __init__(self, root, ann_file, max_samples=None):
         from pycocotools.coco import COCO
         self.root = root
@@ -58,7 +56,6 @@ class CocoDeticDataset(Dataset):
             x, y, bw, bh = ann["bbox"]
             if bw <= 0 or bh <= 0:
                 continue
-            # Normalize to [0, 1]
             boxes.append([x / w, y / h, (x + bw) / w, (y + bh) / h])
             class_labels.append(ann["category_id"])
 
@@ -74,8 +71,6 @@ class CocoDeticDataset(Dataset):
         }
 
     def _map_labels(self, labels):
-        """Map COCO category IDs (1-90) to 0-79 indices."""
-        # COCO category ID mapping from annotations
         cats = sorted([c["id"] for c in self.coco.loadCats(self.coco.getCatIds())])
         id_to_idx = {cid: i for i, cid in enumerate(cats)}
         return torch.tensor([id_to_idx[l] for l in labels], dtype=torch.long)
@@ -105,19 +100,17 @@ class CollateFn:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_dir", default="~/cv_project/models/detic")
+    parser.add_argument("--model_dir", default="~/cv_project/models/owlvit")
     parser.add_argument("--data_dir", default="~/cv_project/datasets/coco")
     parser.add_argument("--epochs", type=int, default=12)
-    parser.add_argument("--batch", type=int, default=4)
+    parser.add_argument("--batch", type=int, default=8)
     parser.add_argument("--lr", type=float, default=2e-4)
     parser.add_argument("--warmup", type=int, default=1000)
     parser.add_argument("--weight_decay", type=float, default=1e-4)
-    parser.add_argument("--output_dir", default="results/detic")
+    parser.add_argument("--output_dir", default="results/owlvit")
     parser.add_argument("--max_samples", type=int, default=None)
-    parser.add_argument("--gradient_accum", type=int, default=2)
+    parser.add_argument("--gradient_accum", type=int, default=1)
     parser.add_argument("--resume", action="store_true", default=False)
-    parser.add_argument("--freeze_backbone", action="store_true", default=False)
-    parser.add_argument("--freeze_decoder", action="store_true", default=False)
     args = parser.parse_args()
 
     model_dir = os.path.expanduser(args.model_dir)
@@ -132,30 +125,14 @@ def main():
         print(f"Resuming from {ckpt_dir}" if ckpt_dir else "No checkpoint, fresh start")
 
     print("Loading processor and model...")
-    processor = AutoImageProcessor.from_pretrained(model_dir, local_files_only=True)
+    processor = OwlViTImageProcessor.from_pretrained(model_dir, local_files_only=True)
 
-    freeze_backbone = getattr(args, 'freeze_backbone', False)
     if ckpt_dir:
-        model = DeformableDetrForObjectDetection.from_pretrained(ckpt_dir)
+        model = OwlViTForObjectDetection.from_pretrained(ckpt_dir)
     else:
-        model = DeformableDetrForObjectDetection.from_pretrained(
+        model = OwlViTForObjectDetection.from_pretrained(
             model_dir, local_files_only=True, ignore_mismatched_sizes=True
         )
-
-    if freeze_backbone:
-        freeze_decoder = getattr(args, 'freeze_decoder', False)
-        frozen = 0
-        freeze_keys = ['backbone', 'encoder']
-        if freeze_decoder:
-            freeze_keys.append('decoder')
-        for name, param in model.named_parameters():
-            if any(k in name for k in freeze_keys):
-                param.requires_grad = False
-                frozen += 1
-        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        total = sum(p.numel() for p in model.parameters())
-        print(f"Frozen {frozen} backbone/encoder params, "
-              f"trainable: {trainable/1e6:.1f}M / {total/1e6:.1f}M")
 
     train_ann = os.path.join(data_dir, "annotations", "annotations",
                               "instances_train2017.json")
@@ -164,8 +141,9 @@ def main():
     train_root = os.path.join(data_dir, "train2017")
     val_root = os.path.join(data_dir, "val2017")
 
-    train_dataset = CocoDeticDataset(train_root, train_ann, max_samples=args.max_samples)
-    val_dataset = CocoDeticDataset(val_root, val_ann, max_samples=args.max_samples // 4 if args.max_samples else None)
+    train_dataset = CocoOwlVitDataset(train_root, train_ann, max_samples=args.max_samples)
+    val_dataset = CocoOwlVitDataset(val_root, val_ann,
+                                    max_samples=args.max_samples // 4 if args.max_samples else None)
     print(f"Train: {len(train_dataset)}, Val: {len(val_dataset)}")
 
     training_args = TrainingArguments(
@@ -190,7 +168,6 @@ def main():
         dataloader_num_workers=2,
         report_to="none",
         remove_unused_columns=False,
-        ddp_find_unused_parameters=False,
     )
 
     trainer = Trainer(
@@ -203,7 +180,6 @@ def main():
 
     print("Starting training...")
     trainer.train(resume_from_checkpoint=ckpt_dir)
-    # Save with safe_serialization=False to handle shared weights in DETR
     trainer.save_model(os.path.join(output_dir, "final"))
     print("Training complete.")
 

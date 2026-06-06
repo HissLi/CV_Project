@@ -1,0 +1,16 @@
+{
+  "experiment": "owlvit_zeroshot",
+  "model": "OWL-ViT-B/32 (google/owlvit-base-patch32)",
+  "mode": "zero-shot (no fine-tuning)",
+  "dataset": "COCO val2017",
+  "batch_size": 8,
+  "text_prompt": "a photo of a {class}",
+  "results": {
+    "mAP": 0.0401,
+    "mAP50": 0.0640,
+    "mAP75": 0.0428,
+    "AP_s": 0.015,
+    "AP_m": 0.037,
+    "AP_l": 0.067
+  }
+}
