@@ -9,6 +9,9 @@
 | yolow_lr1e-5_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=1e-5 | 1e-5 | 8 | 6 | 完成 | 0.661 | 0.501 |
 | yolow_lr5e-5_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=5e-5 | 5e-5 | 8 | 6 | 完成 | 0.671 | 0.507 |
 | yolow_lr1e-4_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=1e-4 | 1e-4 | 8 | 6 | 完成 | 0.671 | 0.506 |
+| yolow_lr3e-4_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=3e-4 | 3e-4 | 8 | 6 | 完成 | 0.653 | 0.488 |
+| yolow_lr5e-4_bs8_ep6 | 2026-06-08 | YOLO-World-L | Phase 2 LR=5e-4 | 5e-4 | 8 | 6 | 完成 | 0.636 | 0.474 |
+| yolow_lr1e-3_bs8_ep6 | 2026-06-08 | YOLO-World-L | Phase 2 LR=1e-3 | 1e-3 | 8 | 6 | 完成 | 0.611 | 0.450 |
 
 ---
 
