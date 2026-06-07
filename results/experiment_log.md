@@ -6,6 +6,9 @@
 |----|------|------|------|-----|----|--------|------|-------|----------|
 | yolow_lr2e-4_bs8_ep12 | 2026-06-06 | YOLO-World-L | Phase 1 Baseline | 2e-4 | 8 | 12 | 完成 | 0.661 | 0.497 |
 | owlvit_zeroshot | 2026-06-06 | OWL-ViT-B/32 | Zero-shot Eval | — | 8 (eval) | — | 完成 | 0.064 | 0.040 |
+| yolow_lr1e-5_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=1e-5 | 1e-5 | 8 | 6 | 完成 | 0.661 | 0.501 |
+| yolow_lr5e-5_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=5e-5 | 5e-5 | 8 | 6 | 完成 | 0.671 | 0.507 |
+| yolow_lr1e-4_bs8_ep6 | 2026-06-07 | YOLO-World-L | Phase 2 LR=1e-4 | 1e-4 | 8 | 6 | 完成 | 0.671 | 0.506 |
 
 ---
 

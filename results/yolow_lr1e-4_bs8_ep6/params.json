@@ -1,0 +1,1 @@
+{"experiment":"yolow_lr1e-4_bs8_ep6","phase":"Phase 2 — LR Sweep","model":"YOLO-World-L","job_id":"89094","hyperparameters":{"lr":1e-4,"batch_size":8,"epochs":6,"warmup":1000,"optimizer":"AdamW","weight_decay":0.05,"image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.67127,"mAP50_95":0.50552}}
