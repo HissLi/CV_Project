@@ -4,14 +4,14 @@
 
 | ID | 日期 | 模型 | 阶段 | lr | bs | epochs | 状态 | mAP50 | mAP50-95 |
 |----|------|------|------|-----|----|--------|------|-------|----------|
-| yolow_baseline | 2026-06-06 | YOLO-World-L | Phase 1 Baseline | 2e-4 | 8 | 12 | 完成 | 0.661 | 0.497 |
+| yolow_lr2e-4_bs8_ep12 | 2026-06-06 | YOLO-World-L | Phase 1 Baseline | 2e-4 | 8 | 12 | 完成 | 0.661 | 0.497 |
 | owlvit_zeroshot | 2026-06-06 | OWL-ViT-B/32 | Zero-shot Eval | — | 8 (eval) | — | 完成 | 0.064 | 0.040 |
 
 ---
 
 ## 实验详情
 
-### yolow_baseline — YOLO-World-L Phase 1 Baseline
+### yolow_lr2e-4_bs8_ep12 — YOLO-World-L Phase 1 Baseline
 
 | 参数 | 值 |
 |------|-----|
@@ -65,8 +65,8 @@
 | 12 | 0.859 | 0.811 | 0.661 | 0.497 |
 
 **文件位置：**
-- 本地: `results/yolow_baseline_20260606_1907/`
-- 服务器: `~/cv_project/runs/detect/results/yolow/yolow_baseline_lr2e-4_bs8/`
+- 本地: `results/yolow_lr2e-4_bs8_ep12_20260606_1907/`
+- 服务器: `~/cv_project/runs/detect/results/yolow/yolow_lr2e-4_bs8_ep12_lr2e-4_bs8/`
 
 ---
 

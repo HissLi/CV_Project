@@ -20,6 +20,6 @@ echo "LR=${LR:-2e-4} BS=${BS:-8} EPOCHS=${EPOCHS:-12}"
 python ~/cv_project/scripts/train_yolow.py \
     --lr ${LR:-2e-4} --batch ${BS:-8} --epochs ${EPOCHS:-12} \
     --warmup ${WARMUP:-1000} \
-    --name "${NAME:-baseline}_lr${LR:-2e-4}_bs${BS:-8}"
+    --name "${NAME:-baseline}"
 
 echo "Done: $SLURM_JOB_ID"
