@@ -15,6 +15,7 @@
 | yolow_lr5e-5_bs8_ep12 | 2026-06-08 | YOLO-World-L | Phase 2b Best LR | 5e-5 | 8 | 12 | 完成 | 0.677 | 0.511 |
 | yolow_sgd_lr1e-2_bs8_ep6 | 2026-06-08 | YOLO-World-L | Phase 3 SGD lr=1e-2 | 1e-2 | 8 | 6 | 完成 | 0.248 | 0.163 |
 | yolow_sgd_lr5e-2_bs8_ep6 | 2026-06-08 | YOLO-World-L | Phase 3 SGD lr=5e-2 | 5e-2 | 8 | 6 | 完成 | 0.081 | 0.048 |
+| yolow_sgd_lr1e-1_bs8_ep6 | 2026-06-08 | YOLO-World-L | Phase 3 SGD lr=1e-1 | 1e-1 | 8 | 6 | 完成 | 0.021 | 0.011 |
 
 ---
 
