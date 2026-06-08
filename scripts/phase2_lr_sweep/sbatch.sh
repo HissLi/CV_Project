@@ -15,11 +15,12 @@ export PYTHONUNBUFFERED=1
 
 echo "=== Job: $SLURM_JOB_ID ==="
 echo "Node: $SLURM_NODELIST | GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
-echo "LR=${LR:-2e-4} BS=${BS:-8} EPOCHS=${EPOCHS:-12}"
+echo "LR=${LR:-2e-4} BS=${BS:-8} EPOCHS=${EPOCHS:-12} OPTIMIZER=${OPTIMIZER:-AdamW} WD=${WD:-0.05} IMGSZ=${IMGSZ:-640} WARMUP=${WARMUP:-1000}"
 
-python ~/cv_project/scripts/train_yolow.py \
+python ~/cv_project/scripts/phase2_lr_sweep/train.py \
     --lr ${LR:-2e-4} --batch ${BS:-8} --epochs ${EPOCHS:-12} \
-    --warmup ${WARMUP:-1000} \
+    --warmup ${WARMUP:-1000} --optimizer ${OPTIMIZER:-AdamW} \
+    --weight_decay ${WD:-0.05} --imgsz ${IMGSZ:-640} \
     --name "${NAME:-baseline}"
 
 echo "Done: $SLURM_JOB_ID"

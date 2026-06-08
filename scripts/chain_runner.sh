@@ -69,7 +69,7 @@ fi
 cd ~/cv_project
 # Export uppercase variables (sbatch script uses LR, EPOCHS, NAME, BS)
 eval $NEXT
-export LR=$lr EPOCHS=$epochs NAME=$name BS=${bs:-8} OPTIMIZER=${optimizer:-AdamW}
+export LR=$lr EPOCHS=$epochs NAME=$name BS=${bs:-8} OPTIMIZER=${optimizer:-AdamW} WARMUP=${warmup:-1000} WD=${wd:-0.05} IMGSZ=${imgsz:-640}
 JOB_ID=$(sbatch --parsable "$SCRIPTS/sbatch.sh" 2>/dev/null)
 echo "[$(date '+%H:%M:%S')] Submitted Task $TOTAL_DONE/$TOTAL_COUNT — $NEXT -> JOB $JOB_ID"
 echo "$JOB_ID $name $lr $epochs $TOTAL_DONE $TOTAL_COUNT" > "$STATE"
