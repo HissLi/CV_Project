@@ -1,0 +1,1 @@
+{"experiment":"yolow_sgd_lr5e-2_bs8_ep6","phase":"Phase 3 — Optimizer SGD","model":"YOLO-World-L","job_id":"89156","hyperparameters":{"lr":5e-2,"batch_size":8,"epochs":6,"optimizer":"SGD","weight_decay":0.05,"image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.08093,"mAP50_95":0.04779}}
