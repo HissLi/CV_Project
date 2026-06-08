@@ -2,7 +2,7 @@
 QUEUE="$HOME/cv_project/experiment_queue.txt"
 STATE="$HOME/cv_project/.chain_state"
 LOG="$HOME/cv_project/logs"
-SCRIPTS="$HOME/cv_project/scripts/phase2_lr_sweep"
+SCRIPTS="$HOME/cv_project/scripts/yolow"
 
 if [ -f "$STATE" ]; then
     read JOB_ID NAME LR_VAL EP_VAL TASK_NUM TOTAL_COUNT < "$STATE"
