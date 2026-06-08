@@ -1,0 +1,1 @@
+{"experiment":"yolow_lr5e-5_bs4_ep6","phase":"Phase 4 — Batch Size","model":"YOLO-World-L","job_id":"89188","hyperparameters":{"lr":5e-5,"batch_size":4,"epochs":6,"optimizer":"AdamW","warmup":1000,"weight_decay":0.05,"image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.65979,"mAP50_95":0.49746},"duration":"4h11m"}
