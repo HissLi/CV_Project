@@ -19,6 +19,7 @@
 | yolow_lr5e-5_bs4_ep6 | 2026-06-09 | YOLO-World-L | Phase 4 BS=4 | 5e-5 | 4 | 6 | 完成 | 0.660 | 0.497 |
 | yolow_lr5e-5_bs16_ep6 | 2026-06-09 | YOLO-World-L | Phase 4 BS=16 | 5e-5 | 16 | 6 | 完成 | 0.678 | 0.514 |
 | yolow_wd1e-5_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 5 WD=1e-5 | 5e-5 | 8 | 6 | 完成 | 0.672 | 0.509 |
+| yolow_wd1e-3_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 5 WD=1e-3 | 5e-5 | 8 | 6 | 完成 | 0.671 | 0.508 |
 
 ---
 
