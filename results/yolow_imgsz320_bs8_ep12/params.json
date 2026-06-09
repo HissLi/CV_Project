@@ -1,0 +1,1 @@
+{"experiment":"yolow_imgsz320_bs8_ep12","phase":"Phase 7 — Image Size","model":"YOLO-World-L","job_id":"89289","hyperparameters":{"lr":5e-5,"batch_size":8,"epochs":12,"imgsz":320,"optimizer":"AdamW","weight_decay":0.05,"scheduler":"cosine"},"results":{"mAP50":0.58378,"mAP50_95":0.4261}}
