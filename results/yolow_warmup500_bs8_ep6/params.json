@@ -1,0 +1,1 @@
+{"experiment":"yolow_warmup500_bs8_ep6","phase":"Phase 6 — Warmup","model":"YOLO-World-L","job_id":"89268","hyperparameters":{"lr":5e-5,"batch_size":8,"epochs":6,"warmup":500,"optimizer":"AdamW","weight_decay":0.05,"image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.67406,"mAP50_95":0.50952}}
