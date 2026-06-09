@@ -21,6 +21,7 @@
 | yolow_wd1e-5_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 5 WD=1e-5 | 5e-5 | 8 | 6 | 完成 | 0.672 | 0.509 |
 | yolow_wd1e-3_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 5 WD=1e-3 | 5e-5 | 8 | 6 | 完成 | 0.671 | 0.508 |
 | yolow_wd1e-2_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 5 WD=1e-2 | 5e-5 | 8 | 6 | 完成 | 0.672 | 0.508 |
+| yolow_warmup0_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 6 Warmup=0 | 5e-5 | 8 | 6 | 完成 | 0.674 | 0.509 |
 
 ---
 
