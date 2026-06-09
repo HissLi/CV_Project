@@ -1,0 +1,1 @@
+{"experiment":"yolow_wd1e-5_bs8_ep6","phase":"Phase 5 — Weight Decay","model":"YOLO-World-L","job_id":"89232","hyperparameters":{"lr":5e-5,"batch_size":8,"epochs":6,"wd":1e-5,"optimizer":"AdamW","image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.67181,"mAP50_95":0.50874}}
