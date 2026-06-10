@@ -1,0 +1,1 @@
+{"experiment":"yolow_best_final1","phase":"Phase 10 — Final Run 1","model":"YOLO-World-L","job_id":"89319","hyperparameters":{"lr":5e-5,"batch_size":8,"epochs":12,"optimizer":"AdamW","weight_decay":0.05,"image_size":640,"scheduler":"cosine"},"results":{"mAP50":0.67688,"mAP50_95":0.51137}}

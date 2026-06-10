@@ -25,6 +25,9 @@
 | yolow_warmup500_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 6 Warmup=500 | 5e-5 | 8 | 6 | 完成 | 0.674 | 0.510 |
 | yolow_warmup2000_bs8_ep6 | 2026-06-09 | YOLO-World-L | Phase 6 Warmup=2000 | 5e-5 | 8 | 6 | 完成 | 0.673 | 0.508 |
 | yolow_imgsz320_bs8_ep12 | 2026-06-10 | YOLO-World-L | Phase 7 imgsz=320 | 5e-5 | 8 | 12 | 完成 | 0.584 | 0.426 |
+| yolow_imgsz800_bs8_ep12 | 2026-06-10 | YOLO-World-L | Phase 7 imgsz=800 | 5e-5 | 8 | 12 | 完成 | 0.686 | 0.520 |
+| yolow_best_ep24 | 2026-06-10 | YOLO-World-L | Phase 9 24 epoch | 5e-5 | 8 | 24 | 完成 | 0.685 | 0.517 |
+| yolow_best_final1 | 2026-06-11 | YOLO-World-L | Phase 10 Final 1 | 5e-5 | 8 | 12 | 完成 | 0.67688 | 0.51137 |
 
 ---
 
