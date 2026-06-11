@@ -28,6 +28,7 @@
 | yolow_imgsz800_bs8_ep12 | 2026-06-10 | YOLO-World-L | Phase 7 imgsz=800 | 5e-5 | 8 | 12 | 完成 | 0.686 | 0.520 |
 | yolow_best_ep24 | 2026-06-10 | YOLO-World-L | Phase 9 24 epoch | 5e-5 | 8 | 24 | 完成 | 0.685 | 0.517 |
 | yolow_best_final1 | 2026-06-11 | YOLO-World-L | Phase 10 Final 1 | 5e-5 | 8 | 12 | 完成 | 0.67688 | 0.51137 |
+| yolow_best_final2 | 2026-06-11 | YOLO-World-L | Phase 10 Final 2 | 5e-5 | 8 | 12 | 完成 | 0.677 | 0.511 |
 
 ---
 
