@@ -228,3 +228,54 @@ OPTIMIZER=SGD LR=1e-2 EPOCHS=6 NAME=yolow_sgd_lr1e2 sbatch scripts/sbatch_yolow.
 - 如果 160h 预算有余：增加 lr-bs-wd 三因素交叉实验
 - 如果时间紧张：削减 Phase 4-8 中各减 1 个值
 - NMS/conf threshold 调优：不需要训练，可在评估阶段进行
+
+---
+
+## 8. 扩展方案：Phase 11-14（~72h）
+
+已完成 Phase 1-10（85h），剩余 ~75h。关键发现：最优 lr=5e-5，最佳分辨率=800 (0.686)，SGD 失败，WD/Warmup/BS 不敏感。
+
+### Phase 11：最佳配置交叉（~28h）
+
+| 实验 | 配置 | epochs | 预计 | 目的 |
+|------|------|------|------|------|
+| P11-1 | lr=5e-5, imgsz=800, bs=8 | 24 | ~11h | 最优组合上限 |
+| P11-2 | lr=5e-5, imgsz=640, bs=8 | 48 | ~22h | epoch 数 vs 分辨率 |
+| P11-3 | lr=5e-5, imgsz=800, bs=16 | 12 | ~3h | 大 bs 高分辨率测试 |
+
+### Phase 12：模型规模（~20h）
+
+| 实验 | 模型 | 配置 | epochs | 预计 |
+|------|------|------|------|------|
+| P12-1 | YOLO-World-S | lr=5e-5, bs=16 | 12 | ~3h |
+| P12-2 | YOLO-World-M | lr=5e-5, bs=12 | 12 | ~4h |
+| P12-3 | YOLO-World-S | best config | 24 | ~6h |
+| P12-4 | YOLO-World-M | best config | 24 | ~8h |
+
+### Phase 13：数据增强消融（~10h）
+
+| 实验 | 配置 | epochs | 预计 |
+|------|------|------|------|
+| P13-1 | mosaic=0 | 6 | ~2.5h |
+| P13-2 | auto_augment=False | 6 | ~2.5h |
+| P13-3 | erasing=0 | 6 | ~2.5h |
+| P13-4 | 更强多尺度 scale=0.9 | 6 | ~2.5h |
+
+### Phase 14：Freeze Backbone（~10h）
+
+| 实验 | 配置 | epochs | 预计 |
+|------|------|------|------|
+| P14-1 | freeze backbone, best lr | 12 | ~5.5h |
+| P14-2 | freeze backbone, imgsz=800 | 12 | ~5.5h |
+
+### 时间总览
+
+| Phase | 实验数 | 时间 |
+|------|------|------|
+| 11 | 3 | ~28h |
+| 12 | 4 | ~21h |
+| 13 | 4 | ~10h |
+| 14 | 2 | ~11h |
+| **总计** | **13** | **~70h** |
+
+累计 ~155h / 160h。
