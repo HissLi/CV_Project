@@ -1,0 +1,1 @@
+{"experiment":"yolow_p11_800_ep24","phase":"Phase 11 — Best Config","model":"YOLO-World-L","job_id":"89431","hyperparameters":{"lr":5e-5,"batch_size":8,"epochs":24,"imgsz":800,"optimizer":"AdamW"},"results":{"mAP50":0.69432,"mAP50_95":0.52762},"duration":"~17h"}
