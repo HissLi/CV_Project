@@ -1,12 +1,12 @@
 # YOLO-World Hyperparameter Sensitivity Study on COCO 2017
-
+$$
 ## Experiment Overview
 
 - **Models**: YOLO-World-L (primary) + YOLO-World-S / YOLO-World-M / OWL-ViT
 - **Dataset**: COCO 2017 (118K train, 5K val)
 - **Hardware**: NVIDIA L40 48GB × 1
 - **Framework**: Ultralytics 8.4.60, PyTorch 2.5.1+cu121
-- **Total GPU Time**: ~170 hours
+- **Total GPU Time**: ~170 hours$$
 - **Total Experiments**: 35
 - **Date**: 2026-06-06 to 2026-06-14
 

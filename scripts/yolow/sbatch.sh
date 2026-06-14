@@ -15,12 +15,21 @@ export PYTHONUNBUFFERED=1
 
 echo "=== Job: $SLURM_JOB_ID ==="
 echo "Node: $SLURM_NODELIST | GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
-echo "LR=${LR:-2e-4} BS=${BS:-8} EPOCHS=${EPOCHS:-12} OPTIMIZER=${OPTIMIZER:-AdamW} WD=${WD:-0.05} IMGSZ=${IMGSZ:-640} WARMUP=${WARMUP:-1000}"
+echo "LR=${LR:-2e-4} BS=${BS:-8} EPOCHS=${EPOCHS:-12} OPTIMIZER=${OPTIMIZER:-AdamW} WD=${WD:-0.05} IMGSZ=${IMGSZ:-640} WARMUP=${WARMUP:-1000} MODEL=${MODEL:-yolov8l-worldv2.pt} FREEZE=${FREEZE:-0} MOSAIC=${MOSAIC:-1.0} AA=${AUTO_AUGMENT:-randaugment} ERASING=${ERASING:-0.4} SCALE=${SCALE:-0.5}"
 
-python ~/cv_project/scripts/phase2_lr_sweep/train.py \
+MODEL_FLAG="--model ~/cv_project/models/${MODEL:-yolov8l-worldv2.pt}"
+FREEZE_FLAG=""
+if [ "${FREEZE:-0}" = "1" ]; then
+    FREEZE_FLAG="--freeze"
+    echo "Freeze backbone enabled"
+fi
+
+python ~/cv_project/scripts/yolow/train.py \
     --lr ${LR:-2e-4} --batch ${BS:-8} --epochs ${EPOCHS:-12} \
     --warmup ${WARMUP:-1000} --optimizer ${OPTIMIZER:-AdamW} \
     --weight_decay ${WD:-0.05} --imgsz ${IMGSZ:-640} \
-    --name "${NAME:-baseline}"
+    --name "${NAME:-baseline}" $MODEL_FLAG $FREEZE_FLAG \
+    --mosaic ${MOSAIC:-1.0} --auto_augment ${AUTO_AUGMENT:-randaugment} \
+    --erasing ${ERASING:-0.4} --scale ${SCALE:-0.5}
 
 echo "Done: $SLURM_JOB_ID"

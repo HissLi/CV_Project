@@ -47,6 +47,11 @@ def main():
     parser.add_argument("--project", default="results/yolow")
     parser.add_argument("--name", default="train")
     parser.add_argument("--cos_lr", action="store_true", default=True)
+    parser.add_argument("--freeze", action="store_true", default=False)
+    parser.add_argument("--mosaic", type=float, default=1.0)
+    parser.add_argument("--auto_augment", type=str, default="randaugment")
+    parser.add_argument("--erasing", type=float, default=0.4)
+    parser.add_argument("--scale", type=float, default=0.5)
     args = parser.parse_args()
 
     from ultralytics import YOLO
@@ -64,7 +69,13 @@ def main():
     model = YOLO(model_path)
     print(f"Model loaded. Starting training...")
 
+    freeze_param = None
+    if args.freeze:
+        freeze_param = 10  # freeze first 10 layers (backbone)
+        print(f"Freezing backbone layers (freeze={freeze_param})")
+
     results = model.train(
+        freeze=freeze_param,
         data=data_yaml,
         epochs=args.epochs,
         batch=args.batch,
@@ -87,6 +98,10 @@ def main():
         plots=True,
         close_mosaic=12,  # disable mosaic for last epoch
         nbs=64,
+        mosaic=args.mosaic,
+        auto_augment=args.auto_augment,
+        erasing=args.erasing,
+        scale=args.scale,
     )
     print("Training complete.")
 
