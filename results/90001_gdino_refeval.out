@@ -1,0 +1,5 @@
+=== Job: 90001 ===
+Node: l40gpu001 | GPU: NVIDIA L40
+DATASETS=refcoco SPLIT=val MAX_SAMPLES=100 THRESHOLD=0.25
+Loading model from /home/turing_lab/cse12210210/cv_project/models/gdino
+Done: 90001

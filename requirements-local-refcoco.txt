@@ -1,0 +1,6 @@
+# Local RefCOCO small-sample eval (Mac / Linux CPU or MPS)
+torch>=2.5
+transformers>=4.47.1
+pillow
+tqdm
+huggingface_hub

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv*/
+venv/
+
+# OS / editor
+.DS_Store
+
+# Hugging Face cache
+**/.cache/
+
+# Local model weights (download via scripts; too large for GitHub)
+models/gdino/pytorch_model.bin
+models/gdino/model.safetensors
+models/owlvit/pytorch_model.bin
+models/owlvit/model.safetensors

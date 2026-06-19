@@ -202,6 +202,55 @@ Warmup Steps                █                         Minimal
 
 ---
 
+## 7. Visual Grounding Extension (RefCOCO)
+
+To cover the Visual Grounding part of Topic 4, we implemented a sentence-level RefCOCO evaluation pipeline for both Grounding DINO and OWL-ViT.
+
+### 7.1 Implemented Pipeline
+
+- Shared modules: `scripts/grounding/refcoco_dataset.py`, `scripts/grounding/metrics.py`, `scripts/grounding/visualize.py`
+- Grounding DINO eval: `scripts/gdino/eval_refcoco.py`, `scripts/gdino/sbatch_eval.sh`
+- OWL-ViT eval: `scripts/owlvit/eval_refcoco.py`, `scripts/owlvit/sbatch_eval.sh`
+- Metric: Acc@0.5 / Acc@0.75 / mean IoU (top-1 predicted box per phrase)
+
+### 7.2 Smoke-Test Execution
+
+- Submitted jobs:
+  - GDINO smoke test: job `90001`
+  - OWL-ViT smoke test: job `90002`
+- Both scripts successfully load model and start evaluation entrypoint on the cluster.
+
+### 7.3 Small-Sample Evaluation (Final)
+
+Cluster scheduler was unavailable, so we ran **subset evaluation locally** on Mac M3 (MPS). Primary results use **200 samples per dataset** (600 total):
+
+| Setting | Value |
+|---------|-------|
+| Samples | 200 per dataset (600 total) |
+| Datasets | refcoco, refcoco+, refcocog (val) |
+| Models | Grounding DINO (zero-shot), OWL-ViT (zero-shot) |
+| Metric | Acc@0.5 / Acc@0.75 / mean IoU |
+| Data | PaDT RefCOCO jsonl + 79 COCO2017 images |
+| Runtime | ~42 min total (GDINO ~39 min + OWL-ViT ~3 min) |
+
+**Acc@0.5 (n=200 per dataset):**
+
+| Dataset | GDINO | OWL-ViT |
+|---------|-------|---------|
+| refcoco | 0.085 | 0.210 |
+| refcoco+ | 0.100 | 0.300 |
+| refcocog | 0.260 | 0.305 |
+| **Overall (n=600)** | **0.148** | **0.272** |
+
+**Mean IoU (overall):** GDINO 0.159, OWL-ViT 0.278.
+
+Smaller pilots (n=20/100) showed the same trend: OWL-ViT leads on refcoco/refcoco+, GDINO is competitive on refcocog.
+
+Results: `results/gdino_refcoco_n200/params.json`, `results/owlvit_refcoco_n200/params.json`.  
+These are **subset** benchmarks (first N lines per PaDT jsonl), not full RefCOCO val official numbers.
+
+---
+
 ## Appendix: Complete Results Table
 
 | Experiment | Phase | lr | bs | epochs | imgsz | mAP50 | mAP |

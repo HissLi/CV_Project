@@ -1,0 +1,38 @@
+=== Local RefCOCO small-sample eval ===
+Started: Fri Jun 19 20:05:38 CST 2026
+SMALL_N=20 DEVICE check:
+torch 2.12.1
+device mps
+=== GDINO ===
+Using device: mps
+Loading model from /Users/rickysun/Documents/02 STUDY/CV/CV_Project/models/gdino
+Loading from local cache: /Users/rickysun/Documents/02 STUDY/CV/CV_Project/models/gdino
+Loading weights:   0%|          | 0/1182 [00:00<?, ?it/s]Loading weights:  80%|███████▉  | 941/1182 [00:00<00:00, 9408.66it/s]Loading weights: 100%|██████████| 1182/1182 [00:00<00:00, 9195.13it/s]
+[refcoco] Loaded 20 samples
+GDINO refcoco/val:   0%|          | 0/20 [00:00<?, ?it/s]GDINO refcoco/val:   5%|▌         | 1/20 [00:12<04:03, 12.82s/it]GDINO refcoco/val:  10%|█         | 2/20 [00:15<01:59,  6.63s/it]GDINO refcoco/val:  15%|█▌        | 3/20 [00:16<01:12,  4.26s/it]GDINO refcoco/val:  20%|██        | 4/20 [00:18<00:56,  3.52s/it]GDINO refcoco/val:  25%|██▌       | 5/20 [00:21<00:47,  3.15s/it]GDINO refcoco/val:  30%|███       | 6/20 [00:24<00:42,  3.07s/it]GDINO refcoco/val:  35%|███▌      | 7/20 [00:27<00:38,  2.99s/it]GDINO refcoco/val:  40%|████      | 8/20 [00:29<00:34,  2.83s/it]GDINO refcoco/val:  45%|████▌     | 9/20 [00:31<00:27,  2.47s/it]GDINO refcoco/val:  50%|█████     | 10/20 [00:33<00:22,  2.23s/it]GDINO refcoco/val:  55%|█████▌    | 11/20 [00:34<00:18,  2.05s/it]GDINO refcoco/val:  60%|██████    | 12/20 [00:37<00:18,  2.36s/it]GDINO refcoco/val:  65%|██████▌   | 13/20 [00:39<00:16,  2.31s/it]GDINO refcoco/val:  70%|███████   | 14/20 [00:41<00:12,  2.06s/it]GDINO refcoco/val:  75%|███████▌  | 15/20 [00:42<00:09,  1.88s/it]GDINO refcoco/val:  80%|████████  | 16/20 [00:44<00:07,  1.79s/it]GDINO refcoco/val:  85%|████████▌ | 17/20 [00:46<00:05,  1.97s/it]GDINO refcoco/val:  90%|█████████ | 18/20 [00:48<00:03,  1.87s/it]GDINO refcoco/val:  95%|█████████▌| 19/20 [00:50<00:01,  1.81s/it]GDINO refcoco/val: 100%|██████████| 20/20 [00:51<00:00,  1.76s/it]GDINO refcoco/val: 100%|██████████| 20/20 [00:51<00:00,  2.59s/it]
+[refcoco] {'samples': 20, 'acc_at_05': 0.25, 'acc_at_075': 0.0, 'mean_iou': 0.1836726891264189, 'missing_images': 0}
+[refcoco+] Loaded 20 samples
+GDINO refcoco+/val:   0%|          | 0/20 [00:00<?, ?it/s]GDINO refcoco+/val:   5%|▌         | 1/20 [00:01<00:30,  1.58s/it]GDINO refcoco+/val:  10%|█         | 2/20 [00:03<00:27,  1.51s/it]GDINO refcoco+/val:  15%|█▌        | 3/20 [00:04<00:25,  1.49s/it]GDINO refcoco+/val:  20%|██        | 4/20 [00:05<00:23,  1.47s/it]GDINO refcoco+/val:  25%|██▌       | 5/20 [00:07<00:21,  1.46s/it]GDINO refcoco+/val:  30%|███       | 6/20 [00:08<00:20,  1.46s/it]GDINO refcoco+/val:  35%|███▌      | 7/20 [00:10<00:20,  1.60s/it]GDINO refcoco+/val:  40%|████      | 8/20 [00:12<00:19,  1.62s/it]GDINO refcoco+/val:  45%|████▌     | 9/20 [00:14<00:19,  1.81s/it]GDINO refcoco+/val:  50%|█████     | 10/20 [00:16<00:17,  1.76s/it]GDINO refcoco+/val:  55%|█████▌    | 11/20 [00:17<00:15,  1.68s/it]GDINO refcoco+/val:  60%|██████    | 12/20 [00:19<00:12,  1.62s/it]GDINO refcoco+/val:  65%|██████▌   | 13/20 [00:20<00:11,  1.59s/it]GDINO refcoco+/val:  70%|███████   | 14/20 [00:22<00:09,  1.56s/it]GDINO refcoco+/val:  75%|███████▌  | 15/20 [00:23<00:07,  1.53s/it]GDINO refcoco+/val:  80%|████████  | 16/20 [00:25<00:06,  1.52s/it]GDINO refcoco+/val:  85%|████████▌ | 17/20 [00:27<00:04,  1.61s/it]GDINO refcoco+/val:  90%|█████████ | 18/20 [00:28<00:03,  1.63s/it]GDINO refcoco+/val:  95%|█████████▌| 19/20 [00:30<00:01,  1.64s/it]GDINO refcoco+/val: 100%|██████████| 20/20 [00:32<00:00,  1.66s/it]GDINO refcoco+/val: 100%|██████████| 20/20 [00:32<00:00,  1.60s/it]
+[refcoco+] {'samples': 20, 'acc_at_05': 0.05, 'acc_at_075': 0.0, 'mean_iou': 0.10599159248737111, 'missing_images': 0}
+[refcocog] Loaded 20 samples
+GDINO refcocog/val:   0%|          | 0/20 [00:00<?, ?it/s]GDINO refcocog/val:   5%|▌         | 1/20 [00:02<00:46,  2.42s/it]GDINO refcocog/val:  10%|█         | 2/20 [00:03<00:33,  1.84s/it]GDINO refcocog/val:  15%|█▌        | 3/20 [00:06<00:35,  2.06s/it]GDINO refcocog/val:  20%|██        | 4/20 [00:08<00:32,  2.03s/it]GDINO refcocog/val:  25%|██▌       | 5/20 [00:10<00:30,  2.01s/it]GDINO refcocog/val:  30%|███       | 6/20 [00:11<00:26,  1.91s/it]GDINO refcocog/val:  35%|███▌      | 7/20 [00:14<00:29,  2.27s/it]GDINO refcocog/val:  40%|████      | 8/20 [00:16<00:24,  2.03s/it]GDINO refcocog/val:  45%|████▌     | 9/20 [00:17<00:20,  1.87s/it]GDINO refcocog/val:  50%|█████     | 10/20 [00:19<00:17,  1.76s/it]GDINO refcocog/val:  55%|█████▌    | 11/20 [00:20<00:15,  1.70s/it]GDINO refcocog/val:  60%|██████    | 12/20 [00:22<00:14,  1.78s/it]GDINO refcocog/val:  65%|██████▌   | 13/20 [00:25<00:13,  1.96s/it]GDINO refcocog/val:  70%|███████   | 14/20 [00:27<00:11,  1.89s/it]GDINO refcocog/val:  75%|███████▌  | 15/20 [00:28<00:09,  1.88s/it]GDINO refcocog/val:  80%|████████  | 16/20 [00:30<00:07,  1.89s/it]GDINO refcocog/val:  85%|████████▌ | 17/20 [00:33<00:06,  2.08s/it]GDINO refcocog/val:  90%|█████████ | 18/20 [00:35<00:04,  2.09s/it]GDINO refcocog/val:  95%|█████████▌| 19/20 [00:37<00:02,  2.06s/it]GDINO refcocog/val: 100%|██████████| 20/20 [00:39<00:00,  2.11s/it]GDINO refcocog/val: 100%|██████████| 20/20 [00:39<00:00,  1.98s/it]
+[refcocog] {'samples': 20, 'acc_at_05': 0.2, 'acc_at_075': 0.2, 'mean_iou': 0.22278189673285126, 'missing_images': 0}
+Saved summary to /Users/rickysun/Documents/02 STUDY/CV/CV_Project/results/gdino_refcoco_small/params.json
+Overall: {'samples': 60, 'acc_at_05': 0.16666666666666666, 'acc_at_075': 0.06666666666666667, 'mean_iou': 0.17081539278221375}
+=== OWL-ViT ===
+Using device: mps
+Loading OWL-ViT from /Users/rickysun/Documents/02 STUDY/CV/CV_Project/models/owlvit
+Loading from local cache: /Users/rickysun/Documents/02 STUDY/CV/CV_Project/models/owlvit
+Loading weights:   0%|          | 0/412 [00:00<?, ?it/s]Loading weights: 100%|██████████| 412/412 [00:00<00:00, 9568.72it/s]
+[refcoco] Loaded 20 samples
+OWLViT refcoco/val:   0%|          | 0/10 [00:00<?, ?it/s]OWLViT refcoco/val:   0%|          | 0/10 [00:01<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/rickysun/Documents/02 STUDY/CV/CV_Project/scripts/owlvit/eval_refcoco.py", line 178, in <module>
+    main()
+    ~~~~^^
+  File "/Users/rickysun/Documents/02 STUDY/CV/CV_Project/scripts/owlvit/eval_refcoco.py", line 162, in main
+    result = run_dataset(model, processor, dataset, args.split, args, device)
+  File "/Users/rickysun/Documents/02 STUDY/CV/CV_Project/scripts/owlvit/eval_refcoco.py", line 94, in run_dataset
+    processed = processor.post_process_object_detection(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'OwlViTProcessor' object has no attribute 'post_process_object_detection'. Did you mean: 'post_process_grounded_object_detection'?

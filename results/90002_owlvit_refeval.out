@@ -1,0 +1,5 @@
+=== Job: 90002 ===
+Node: l40gpu001 | GPU: NVIDIA L40
+DATASETS=refcoco SPLIT=val MAX_SAMPLES=100 THRESHOLD=0.1 BS=8
+Loading OWL-ViT from /home/turing_lab/cse12210210/cv_project/models/owlvit
+Done: 90002

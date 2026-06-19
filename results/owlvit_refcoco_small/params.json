@@ -1,0 +1,37 @@
+{
+  "model": "owlvit-base-patch32",
+  "mode": "zero-shot",
+  "task": "referring expression grounding",
+  "split": "val",
+  "threshold": 0.1,
+  "batch_size": 1,
+  "datasets": {
+    "refcoco": {
+      "samples": 20,
+      "acc_at_05": 0.1,
+      "acc_at_075": 0.1,
+      "mean_iou": 0.10583882277935838,
+      "missing_images": 0
+    },
+    "refcoco+": {
+      "samples": 20,
+      "acc_at_05": 0.25,
+      "acc_at_075": 0.25,
+      "mean_iou": 0.20788620139920294,
+      "missing_images": 0
+    },
+    "refcocog": {
+      "samples": 20,
+      "acc_at_05": 0.25,
+      "acc_at_075": 0.25,
+      "mean_iou": 0.297358447865136,
+      "missing_images": 0
+    }
+  },
+  "overall": {
+    "samples": 60,
+    "acc_at_05": 0.2,
+    "acc_at_075": 0.2,
+    "mean_iou": 0.20369449068123244
+  }
+}

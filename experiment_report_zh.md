@@ -202,6 +202,55 @@
 
 ---
 
+## 7. Visual Grounding 扩展（RefCOCO）
+
+为覆盖 Topic 4 的 Visual Grounding 部分，我们实现了 Grounding DINO 与 OWL-ViT 的 RefCOCO 句子级评估流水线。
+
+### 7.1 已实现内容
+
+- 共享模块：`scripts/grounding/refcoco_dataset.py`、`scripts/grounding/metrics.py`、`scripts/grounding/visualize.py`
+- Grounding DINO 评估：`scripts/gdino/eval_refcoco.py`、`scripts/gdino/sbatch_eval.sh`
+- OWL-ViT 评估：`scripts/owlvit/eval_refcoco.py`、`scripts/owlvit/sbatch_eval.sh`
+- 指标：Acc@0.5 / Acc@0.75 / mean IoU（每条短语取 top-1 预测框）
+
+### 7.2 Smoke Test 执行情况
+
+- 已提交作业：
+  - GDINO smoke test：`90001`
+  - OWL-ViT smoke test：`90002`
+- 两个作业均已在集群上成功加载模型并进入评估入口。
+
+### 7.3 小样本评估（最终方案）
+
+集群调度不可用，改为在 **本地 Mac M3（MPS）** 上跑子集评估。主结果采用 **每数据集 200 条**（共 600 条）：
+
+| 设置 | 值 |
+|------|-----|
+| 样本量 | 每数据集 200 条（共 600 条） |
+| 数据集 | refcoco / refcoco+ / refcocog（val） |
+| 模型 | Grounding DINO 零样本、OWL-ViT 零样本 |
+| 指标 | Acc@0.5 / Acc@0.75 / mean IoU |
+| 数据 | PaDT jsonl + 79 张 COCO2017 子集图 |
+| 耗时 | 合计 ~42 min（GDINO ~39 min + OWL-ViT ~3 min） |
+
+**Acc@0.5（n=200/数据集）：**
+
+| 数据集 | GDINO | OWL-ViT |
+|--------|-------|---------|
+| refcoco | 0.085 | 0.210 |
+| refcoco+ | 0.100 | 0.300 |
+| refcocog | 0.260 | 0.305 |
+| **Overall（n=600）** | **0.148** | **0.272** |
+
+**Overall mean IoU：** GDINO 0.159，OWL-ViT 0.278。
+
+较小规模 pilot（n=20/100）趋势一致：OWL-ViT 在 refcoco/refcoco+ 更强，GDINO 在 refcocog 更有竞争力。
+
+结果：`results/gdino_refcoco_n200/params.json`、`results/owlvit_refcoco_n200/params.json`。  
+仍为 **子集** 评估（PaDT jsonl 前 N 行），非 RefCOCO 全量 val 官方指标。
+
+---
+
 ## 附录：完整结果表
 
 | 实验 | 阶段 | lr | bs | epoch | 分辨率 | mAP50 | mAP |

@@ -126,3 +126,51 @@ Sync to local:
 sshpass -p 'rb6/aYMRAT#16' ssh -o StrictHostKeyChecking=no -p 10022 \
   cse12210210@172.18.34.26 "cat ~/cv_project/runs/detect/results/yolow/<name>/results.csv" > results/<name>/results.csv
 ```
+
+## Visual Grounding Status (RefCOCO)
+
+- New scripts added:
+  - `scripts/grounding/refcoco_dataset.py`
+  - `scripts/grounding/metrics.py`
+  - `scripts/grounding/visualize.py`
+  - `scripts/gdino/eval_refcoco.py`, `scripts/gdino/sbatch_eval.sh`
+  - `scripts/owlvit/eval_refcoco.py`, `scripts/owlvit/sbatch_eval.sh`
+- Smoke jobs submitted:
+  - GDINO: `90001` (first attempt)
+  - OWL-ViT: `90002` (first attempt)
+- Current blocker:
+  - Initial runs (`90001`/`90002`) fail with `FileNotFoundError` for `~/cv_project/datasets/refer/data/refcoco`
+  - Resolved data-source issue by switching to HF mirror (`HF_ENDPOINT=https://hf-mirror.com`) and downloading PaDT RefCOCO val jsonl files to `~/cv_project/datasets/refer/padt/`
+  - New blocker: all current `sbatch` submissions now fail immediately with `Invalid qos specification` (cluster-side scheduler/QOS issue)
+- Current state:
+  - Evaluation pipeline is ready and uploaded to server
+  - RefCOCO val data (PaDT format) is available; runtime results pending scheduler fix
+
+### Plan A (interactive / srun, no sbatch)
+
+Scripts on server:
+- `scripts/grounding/run_refcoco_eval_interactive.sh`
+- `scripts/grounding/srun_refcoco_smoke.sh`
+
+```bash
+# 1) Get GPU shell (after QOS is fixed by admin)
+srun -p gpulab01 --gres=gpu:1 -n 1 --cpus-per-task=8 --mem=32G -t 02:00:00 --pty bash -l
+
+# 2) Inside GPU shell
+cd ~/cv_project
+export HF_ENDPOINT=https://hf-mirror.com
+MODE=smoke MODEL=gdino bash scripts/grounding/run_refcoco_eval_interactive.sh
+MODE=smoke MODEL=owlvit bash scripts/grounding/run_refcoco_eval_interactive.sh
+MODE=full  MODEL=gdino bash scripts/grounding/run_refcoco_eval_interactive.sh
+MODE=full  MODEL=owlvit bash scripts/grounding/run_refcoco_eval_interactive.sh
+```
+
+Test result (2026-06-17): `sbatch` and `srun` on all tested partitions fail with `Invalid qos specification`. Fallback: **small-sample eval on local Mac M3 (MPS)**.
+
+### RefCOCO subset eval (completed 2026-06-19)
+
+- **n=200 primary** (600/model, ~42 min MPS):
+  - `results/gdino_refcoco_n200/params.json` — Acc@0.5 **0.148**, mean IoU **0.159**
+  - `results/owlvit_refcoco_n200/params.json` — Acc@0.5 **0.272**, mean IoU **0.278**
+- Earlier pilots: n=20 (60/model), n=100 (300/model) — same qualitative trend
+- PaDT val jsonl has ~26k lines total; full val feasible locally but unnecessary for course report

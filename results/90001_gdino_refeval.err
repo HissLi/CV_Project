@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/turing_lab/cse12210210/cv_project/scripts/gdino/eval_refcoco.py", line 191, in <module>
+    main()
+  File "/home/turing_lab/cse12210210/cv_project/scripts/gdino/eval_refcoco.py", line 159, in main
+    result = run_dataset(
+  File "/home/turing_lab/cse12210210/cv_project/scripts/gdino/eval_refcoco.py", line 71, in run_dataset
+    samples = load_refcoco_samples(
+  File "/home/turing_lab/cse12210210/cv_project/scripts/grounding/refcoco_dataset.py", line 134, in load_refcoco_samples
+    return list(iter_refcoco_samples(**kwargs))
+  File "/home/turing_lab/cse12210210/cv_project/scripts/grounding/refcoco_dataset.py", line 85, in iter_refcoco_samples
+    raise FileNotFoundError(
+FileNotFoundError: RefCOCO data folder not found: /home/turing_lab/cse12210210/cv_project/datasets/refer/data/refcoco. Download and unpack the dataset first.

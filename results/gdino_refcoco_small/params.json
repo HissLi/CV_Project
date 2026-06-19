@@ -1,0 +1,36 @@
+{
+  "model": "grounding-dino-base",
+  "mode": "zero-shot",
+  "task": "referring expression grounding",
+  "split": "val",
+  "threshold": 0.25,
+  "datasets": {
+    "refcoco": {
+      "samples": 20,
+      "acc_at_05": 0.25,
+      "acc_at_075": 0.0,
+      "mean_iou": 0.1836726891264189,
+      "missing_images": 0
+    },
+    "refcoco+": {
+      "samples": 20,
+      "acc_at_05": 0.05,
+      "acc_at_075": 0.0,
+      "mean_iou": 0.10599159248737111,
+      "missing_images": 0
+    },
+    "refcocog": {
+      "samples": 20,
+      "acc_at_05": 0.2,
+      "acc_at_075": 0.2,
+      "mean_iou": 0.22278189673285126,
+      "missing_images": 0
+    }
+  },
+  "overall": {
+    "samples": 60,
+    "acc_at_05": 0.16666666666666666,
+    "acc_at_075": 0.06666666666666667,
+    "mean_iou": 0.17081539278221375
+  }
+}
